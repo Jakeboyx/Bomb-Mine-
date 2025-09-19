@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Game Access</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+            height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .login-container {
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 15px 25px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            width: 350px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+            transform: translateY(0);
+            transition: transform 0.5s ease, box-shadow 0.5s ease;
+        }
+        
+        .login-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.4);
+        }
+        
+        .login-logo {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .form-group {
+            position: relative;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 5px;
+            background-color: rgba(236, 240, 241, 0.8);
+            font-size: 16px;
+            transition: all 0.3s;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            background-color: #fff;
+            box-shadow: 0 0 0 2px #3498db;
+        }
+        
+        .form-group label {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            color: #7f8c8d;
+            pointer-events: none;
+            transition: all 0.3s;
+        }
+        
+        .form-group input:focus + label,
+        .form-group input:not(:placeholder-shown) + label {
+            top: -10px;
+            left: 10px;
+            font-size: 12px;
+            background-color: #fff;
+            padding: 0 5px;
+            color: #3498db;
+        }
+        
+        .login-btn {
+            background: linear-gradient(to right, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .login-btn:hover {
+            background: linear-gradient(to right, #2980b9, #3498db);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .login-btn:active {
+            transform: translateY(0);
+        }
+        
+        .error-message {
+            color: #e74c3c;
+            font-size: 14px;
+            margin-top: 10px;
+            display: none;
+            animation: shake 0.5s;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .clock {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 18px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="clock" id="clock"></div>
+    
+    <div class="login-container">
+        <div class="login-logo">🎮 Mine Game</div>
+        <form class="login-form" id="login-form">
+            <div class="form-group">
+                <input type="text" id="user-id" placeholder=" " required>
+                <label for="user-id">User ID</label>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" placeholder=" " required>
+                <label for="password">Password</label>
+            </div>
+            <button type="submit" class="login-btn">Login</button>
+            <div class="error-message" id="error-message">Invalid credentials. Please try again.</div>
+        </form>
+    </div>
+
+    <script>
+        // Live clock functionality
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('clock').textContent = timeString;
+        }
+        
+        setInterval(updateClock, 1000);
+        updateClock(); // Initial call
+        
+        // Login validation
+        document.getElementById('login-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const userId = document.getElementById('user-id').value;
+            const password = document.getElementById('password').value;
+            
+            // Check against master credentials
+            if (userId === '595713099' && password === '1730') {
+                // Successful login
+                localStorage.setItem('authenticated', 'true');
+                window.location.href = 'index.html';
+            } else {
+                // Failed login
+                document.getElementById('error-message').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('error-message').style.display = 'none';
+                }, 3000);
+            }
+        });
+    </script>
+</body>
+</html>

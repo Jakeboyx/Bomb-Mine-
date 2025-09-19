@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bomb Mine Predictor</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="auth-check"></div>
+    
+    <div class="top-bar">
+        <div class="user-info">
+            <i class="fas fa-user-circle"></i>
+            <span id="user-id">595713099</span>
+        </div>
+        <div class="live-clock" id="live-clock"></div>
+        <div class="logout-btn" onclick="logout()">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </div>
+    </div>
+    
+    <div class="container">
+        <div class="game-header">
+            <h1>Bomb Mine Predictor <span class="premium-badge">PRO</span></h1>
+            <p class="description">Advanced prediction algorithm for bomb and diamond locations</p>
+        </div>
+        
+        <div class="dashboard">
+            <div class="dashboard-panel controls-panel">
+                <h3><i class="fas fa-sliders-h"></i> Prediction Controls</h3>
+                <div class="control-group">
+                    <label for="grid-size">Grid Size:</label>
+                    <select id="grid-size" class="modern-select">
+                        <option value="5">5x5</option>
+                        <option value="6" selected>6x6</option>
+                        <option value="7">7x7</option>
+                        <option value="8">8x8</option>
+                    </select>
+                </div>
+                
+                <div class="control-group">
+                    <label for="bomb-count">Bomb Density:</label>
+                    <div class="slider-container">
+                        <input type="range" id="bomb-count" min="10" max="40" value="25" class="modern-slider">
+                        <span id="bomb-percentage" class="percentage-badge">25%</span>
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label for="diamond-count">Diamond Density:</label>
+                    <div class="slider-container">
+                        <input type="range" id="diamond-count" min="5" max="20" value="10" class="modern-slider">
+                        <span id="diamond-percentage" class="percentage-badge">10%</span>
+                    </div>
+                </div>
+                
+                <button id="predict-btn" class="pulse-btn">
+                    <i class="fas fa-magic"></i> Generate Prediction
+                </button>
+            </div>
+            
+            <div class="dashboard-panel stats-panel">
+                <h3><i class="fas fa-chart-line"></i> Prediction Statistics</h3>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fas fa-bomb"></i></div>
+                        <div class="stat-value" id="bomb-cells">0</div>
+                        <div class="stat-label">Bombs</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fas fa-gem"></i></div>
+                        <div class="stat-value" id="diamond-cells">0</div>
+                        <div class="stat-label">Diamonds</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                        <div class="stat-value" id="safe-cells">0</div>
+                        <div class="stat-label">Safe Cells</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-icon"><i class="fas fa-percentage"></i></div>
+                        <div class="stat-value" id="accuracy-rate">0%</div>
+                        <div class="stat-label">Accuracy</div>
+                    </div>
+                </div>
+                <div class="prediction-confidence">
+                    <div class="confidence-label">Prediction Confidence:</div>
+                    <div class="confidence-meter">
+                        <div class="confidence-bar" id="confidence-bar"></div>
+                    </div>
+                    <div class="confidence-value" id="confidence-value">0%</div>
+                </div>
+                <div class="timer">
+                    <i class="fas fa-stopwatch"></i>
+                    <span id="prediction-timer">00:00</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="game-container">
+            <div class="legend">
+                <div class="legend-item"><span class="legend-color bomb-color"></span> Bomb</div>
+                <div class="legend-item"><span class="legend-color diamond-color"></span> Diamond</div>
+                <div class="legend-item"><span class="legend-color safe-color"></span> Safe</div>
+            </div>
+            <div class="game-board" id="game-board">
+                <!-- Prediction grid will be generated here by JavaScript -->
+            </div>
+        </div>
+        
+        <div class="info-panel">
+            <div class="info-header">
+                <h3><i class="fas fa-info-circle"></i> How This Works</h3>
+                <button class="toggle-info-btn" id="toggle-info-btn">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
+            </div>
+            <div class="info-content" id="info-content">
+                <p>This predictor uses advanced algorithms to forecast bomb and diamond locations:</p>
+                <ul>
+                    <li><i class="fas fa-brain"></i> AI-powered prediction model analyzes patterns</li>
+                    <li><i class="fas fa-chart-bar"></i> Heatmap visualization shows probability distribution</li>
+                    <li><i class="fas fa-gem"></i> Diamond detection algorithm identifies valuable locations</li>
+                    <li><i class="fas fa-shield-alt"></i> Safe path calculation helps navigate dangerous areas</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        // Authentication check
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!localStorage.getItem('authenticated')) {
+                window.location.href = 'login.html';
+            }
+        });
+        
+        // Logout function
+        function logout() {
+            localStorage.removeItem('authenticated');
+            window.location.href = 'login.html';
+        }
+        
+        // Live clock
+        function updateClock() {
+            const now = new Date();
+            const timeString = now.toLocaleTimeString();
+            document.getElementById('live-clock').textContent = timeString;
+        }
+        
+        setInterval(updateClock, 1000);
+        updateClock();
+        
+        // Prediction timer
+        let predictionSeconds = 0;
+        let timerInterval;
+        
+        function startPredictionTimer() {
+            clearInterval(timerInterval);
+            predictionSeconds = 0;
+            updatePredictionTimer();
+            timerInterval = setInterval(updatePredictionTimer, 1000);
+        }
+        
+        function updatePredictionTimer() {
+            const minutes = Math.floor(predictionSeconds / 60).toString().padStart(2, '0');
+            const seconds = (predictionSeconds % 60).toString().padStart(2, '0');
+            document.getElementById('prediction-timer').textContent = `${minutes}:${seconds}`;
+            predictionSeconds++;
+        }
+        
+        // Update diamond percentage display
+        document.getElementById('diamond-count').addEventListener('input', function() {
+            const diamondPercentage = this.value;
+            document.getElementById('diamond-percentage').textContent = `${diamondPercentage}%`;
+        });
+        
+        // Toggle info panel
+        document.getElementById('toggle-info-btn').addEventListener('click', function() {
+            const infoContent = document.getElementById('info-content');
+            const btn = document.getElementById('toggle-info-btn');
+            
+            if (infoContent.style.maxHeight) {
+                infoContent.style.maxHeight = null;
+                btn.innerHTML = '<i class="fas fa-chevron-down"></i>';
+            } else {
+                infoContent.style.maxHeight = infoContent.scrollHeight + 'px';
+                btn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+            }
+        });
+        
+        // Override the initializeGame function to start timer
+        const originalPredictGame = window.generatePrediction;
+        window.generatePrediction = function() {
+            startPredictionTimer();
+            if (originalPredictGame) originalPredictGame();
+        };
+    </script>
+</body>
+</html>
